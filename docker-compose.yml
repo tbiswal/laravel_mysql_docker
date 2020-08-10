@@ -1,0 +1,15 @@
+version: '2'
+services:
+  php:
+    image: laravel
+    depends_on: 
+      - composer
+    volumes:
+      - ./:/app
+    working_dir: /app
+    ports:
+      - 8081:80
+  composer:
+    image: composer
+    volumes:
+      - ./:/app
