@@ -1,15 +1,45 @@
 version: '2'
 services:
-  php:
-    image: laravel
-    depends_on: 
-      - composer
-    volumes:
-      - ./:/app
-    working_dir: /app
-    ports:
-      - 8081:80
-  composer:
-    image: composer
-    volumes:
-      - ./:/app
+    app:
+        image: laravel
+        container_name: app
+        depends_on: 
+            - composer
+        tty: true
+        environment:
+            SERVICE_NAME: app
+            SERVICE_TAGS: dev
+        working_dir: /var/www
+        volumes:
+            - ./laravel-app/:/var/www
+            - ./php/vhost/vhost.conf:/etc/apache2/sites-enabled/vhost.conf
+        networks:
+            - app-network
+        ports:
+            - 8081:80
+
+    db:
+        image: mysql:5.7.22
+        container_name: db
+        tty: true
+        ports:
+            - "3307:3306"
+        environment:
+            MYSQL_DATABASE: laravel
+            MYSQL_ROOT_PASSWORD: laravel
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        volumes:
+            - dbdata:/var/lib/mysql
+        networks:
+            - app-network
+
+    composer:
+        image: composer
+       
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    dbdata:
